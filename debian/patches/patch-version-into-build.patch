@@ -1,0 +1,17 @@
+Description: Set release version manually.
+ jq sets the build version by parsing the git branch. There is no git branch during
+ package building however. This patch sets the version manually. The version can be
+ looked up using `git describe --tags --match 'upstream*' | sed 's/^upstream\///'`.
+Author: Simon Elsbrock
+Bug: https://github.com/stedolan/jq/issues/434
+Last-Update: 2014-06-21
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/configure.ac
++++ b/configure.ac
+@@ -1,4 +1,4 @@
+-m4_define([jq_version], m4_esyscmd_s([git describe --tags --dirty --match 'jq-*'|sed 's/^jq-//']))
++m4_define([jq_version], '1.4-1-e73951f')
+ 
+ AC_INIT([jq], [jq_version], [mu@netsoc.tcd.ie],
+              [jq], [http://stedolan.github.com/jq/])

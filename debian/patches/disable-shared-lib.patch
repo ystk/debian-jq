@@ -1,0 +1,41 @@
+Description: Disable building the shared library.
+ Normally the jq binary is statically linked to it, instead we directly build against
+ the source as it was done previously.
+Author: Simon Elsbrock
+Forwarded: not-needed
+Last-Update: 2014-06-22
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -32,12 +32,12 @@
+ 
+ ### libjq
+ 
+-lib_LTLIBRARIES = libjq.la
+-libjq_la_SOURCES = ${LIBJQ_SRC}
+-libjq_la_LIBADD = -lm
+-libjq_la_LDFLAGS = -export-symbols-regex '^j[qv]_' -version-info 1:4:0
++#lib_LTLIBRARIES = libjq.la
++#libjq_la_SOURCES = ${LIBJQ_SRC}
++#libjq_la_LIBADD = -lm
++#libjq_la_LDFLAGS = -export-symbols-regex '^j[qv]_' -version-info 1:4:0
+ 
+-include_HEADERS = jv.h jq.h
++#include_HEADERS = jv.h jq.h
+ 
+ 
+ ### Building the jq binary
+@@ -52,9 +52,9 @@
+ 	$(AM_V_GEN) $(generate_ver); echo "$$ver" > $@
+ 
+ bin_PROGRAMS = jq
+-jq_SOURCES = main.c
+-jq_LDFLAGS = -static-libtool-libs
+-jq_LDADD = libjq.la -lm
++jq_SOURCES = ${LIBJQ_SRC} main.c
++#jq_LDFLAGS = -static-libtool-libs
++jq_LDADD = -lm
+ 
+ ### Tests (make check)
+ 

@@ -1,0 +1,42 @@
+Date: Fri, 18 Jul 2014 16:47:47 +0100
+From: Dejan Latinovic <Dejan.Latinovic@imgtec.com>
+Subject: fix big endian for jq
+
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=754754
+
+package jq FTBFS for mips and other BE architectures.
+
+This patch from upstream fixes this issue for me.
+https://github.com/stedolan/jq/commit/20e629284f94e0c8a14e8425309c913b6ee5b280
+
+The patch is attached.
+
+Index: jq-1.4/configure.ac
+===================================================================
+--- jq-1.4.orig/configure.ac
++++ jq-1.4/configure.ac
+@@ -96,6 +96,12 @@ if test $have___thread = yes; then
+ fi
+ AC_MSG_RESULT($have___thread)
+ 
++AC_C_BIGENDIAN(
++   AC_DEFINE([IEEE_MC68k], 1, [machine is bigendian]),
++   AC_DEFINE([IEEE_8087], 1, [machine is littleendian]),
++   AC_MSG_ERROR(unknown endianess),
++   AC_MSG_ERROR(universial endianess not supported)
++)
+ 
+ AC_SUBST([BUNDLER], ["$bundle_cmd"])
+ 
+Index: jq-1.4/jv_dtoa.c
+===================================================================
+--- jq-1.4.orig/jv_dtoa.c
++++ jq-1.4/jv_dtoa.c
+@@ -187,7 +187,6 @@
+  *	used for input more than STRTOD_DIGLIM digits long (default 40).
+  */
+ 
+-#define IEEE_8087
+ #define NO_ERRNO
+ #define NO_HEX_FP
+ #define No_Hex_NaN
