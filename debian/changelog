@@ -1,3 +1,11 @@
+jq (1.4-2.1+deb8u1) jessie; urgency=high
+
+  * Non-maintainer upload.
+  * Add patch to fix CVE-2015-8863. (Closes: #802231)
+  * Add patch to fix CVE-2016-4074. (Closes: #822456)
+
+ -- Harlan Lieberman-Berg <hlieberman@debian.org>  Thu, 05 Jan 2017 00:26:08 -0500
+
 jq (1.4-2.1) unstable; urgency=medium
 
   * Non-maintainer upload.

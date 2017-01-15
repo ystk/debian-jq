@@ -4,3 +4,5 @@ remove-unecessary-rakefile-deps.patch
 patch-version-into-build.patch
 disable-shared-lib.patch
 big-endian-fix.patch
+stack-exhaustion.patch
+heap-buffer-overflow.patch

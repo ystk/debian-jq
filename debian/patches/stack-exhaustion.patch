@@ -1,0 +1,62 @@
+From 2d38a12d686a5156d4e7afb1fed7851805590582 Mon Sep 17 00:00:00 2001
+From: W-Mark Kubacki <wmark@hurrikane.de>
+Date: Fri, 19 Aug 2016 19:50:39 +0200
+Subject: [PATCH] Skip printing at MAX_DEPTH and deeper
+
+This addresses #1136, and mitigates a stack exhaustion when printing
+a very deeply nested term.
+
+Updated by hlieberman@debian.org for security backport to 1.4.
+---
+ src/jv_print.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+--- a/jv_print.c
++++ b/jv_print.c
+@@ -7,13 +7,17 @@
+ #include "jv_dtoa.h"
+ #include "jv_unicode.h"
+ 
++#ifndef MAX_DEPTH
++#define MAX_DEPTH 256
++#endif
++
+ #define ESC "\033"
+ #define COL(c) (ESC "[" c "m")
+ #define COLRESET (ESC "[0m")
+ 
+ // Colour table. See http://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+ // for how to choose these.
+-static const jv_kind colour_kinds[] = 
++static const jv_kind colour_kinds[] =
+   {JV_KIND_NULL,   JV_KIND_FALSE, JV_KIND_TRUE, JV_KIND_NUMBER,
+    JV_KIND_STRING, JV_KIND_ARRAY, JV_KIND_OBJECT};
+ static const char* const colours[] =
+@@ -99,7 +103,7 @@
+         sprintf(buf, "\\u%04x", c);
+       } else {
+         c -= 0x10000;
+-        sprintf(buf, "\\u%04x\\u%04x", 
++        sprintf(buf, "\\u%04x\\u%04x",
+                 0xD800 | ((c & 0xffc00) >> 10),
+                 0xDC00 | (c & 0x003ff));
+       }
+@@ -124,7 +128,9 @@
+       }
+     }
+   }
+-  switch (jv_get_kind(x)) {
++  if (indent > MAX_DEPTH) {
++    put_str("<stripped: exceeds max depth>", F, S);
++  } else switch (jv_get_kind(x)) {
+   default:
+   case JV_KIND_INVALID:
+     assert(0 && "Invalid value");
+@@ -242,7 +248,7 @@
+       if (colour) put_str(colour, F, S);
+       put_str((flags & JV_PRINT_PRETTY) ? ": " : ":", F, S);
+       if (colour) put_str(COLRESET, F, S);
+-      
++
+       jv_dump_term(C, value, flags, indent + INDENT, F, S);
+       if (colour) put_str(colour, F, S);
+     }
